@@ -471,7 +471,7 @@ export const saveFilesfromFolder = async (req, res) => {
 
 export const getCountFilesFolder = async (req, res) => {
     try {
-        const folderId = req.query.folderId;
+        const folderId = req.params.folderId; // <-- CAMBIO AQUÍ
 
         if (!folderId) {
             return res.status(400).json({ error: 'Se requiere el folderId' });
