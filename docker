@@ -1,5 +1,5 @@
 # Imagen base con Node y apt para instalar FFmpeg
-FROM node:23
+FROM node:18
 
 # Instala FFmpeg
 RUN apt-get update && apt-get install -y ffmpeg
