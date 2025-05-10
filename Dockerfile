@@ -17,4 +17,4 @@ RUN npm install
 EXPOSE 8000
 
 # Comando para ejecutar tu servidor
-CMD ["node", "app.js"]
+CMD ["node", "./src/app.js"]
