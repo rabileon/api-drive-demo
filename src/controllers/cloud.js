@@ -476,7 +476,8 @@ export const getCountFilesFolder = async (req, res) => {
         if (!folderId) {
             return res.status(400).json({ error: 'Se requiere el folderId' });
         }
-
+        // Crear una instancia de la API de Google Drive
+        const drive = google.drive({ version: 'v3', auth: oauth2Client });
         const response = await drive.files.list({
             q: `'${folderId}' in parents and trashed = false`,
             fields: 'files(id)',
