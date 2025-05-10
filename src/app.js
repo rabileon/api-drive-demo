@@ -23,4 +23,14 @@ app.listen(port, () => {
     console.log(`Server running on port ${port}`);
 })
 
+import { exec } from 'child_process';
+
+exec('ffmpeg -version', (error, stdout, stderr) => {
+    if (error) {
+        console.error('FFmpeg no está disponible:', error);
+    } else {
+        console.log('FFmpeg está disponible:\n', stdout);
+    }
+});
+
 dbConnectMysql();
