@@ -468,3 +468,25 @@ export const saveFilesfromFolder = async (req, res) => {
         res.status(500).json({ error: 'Hubo un error al guardar los archivos.' });
     }
 };
+
+export const getCountFilesFolder = async (req, res) => {
+    try {
+        const folderId = req.query.folderId;
+
+        if (!folderId) {
+            return res.status(400).json({ error: 'Se requiere el folderId' });
+        }
+
+        const response = await drive.files.list({
+            q: `'${folderId}' in parents and trashed = false`,
+            fields: 'files(id)',
+            pageSize: 1000,
+        });
+
+        const count = response.data.files.length;
+        res.json({ count });
+    } catch (error) {
+        console.error('Error al contar archivos:', error);
+        res.status(500).json({ error: 'Error al contar archivos en Google Drive' });
+    }
+};
