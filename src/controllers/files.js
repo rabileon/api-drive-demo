@@ -3,15 +3,18 @@ import { Files } from '../config/mysql.js';
 
 export const getFiles = async (req, res) => {
     try {
-        const page = parseInt(req.query.page) || 1; // Página actual
-        const limit = parseInt(req.query.limit) || 20; // Registros por página
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 20;
         const offset = (page - 1) * limit;
 
+        const fileType = req.query.type; // 'Video' o 'Audio'
+        const whereClause = fileType ? { type: fileType } : {}; // Filtro condicional
 
         const { count, rows } = await Files.findAndCountAll({
+            where: whereClause,
             limit,
             offset,
-            order: [['createdAt', 'DESC']], // Ordenar por fecha descendente
+            order: [['createdAt', 'DESC']],
         });
 
         res.json({
@@ -25,5 +28,4 @@ export const getFiles = async (req, res) => {
         console.error('Error al obtener archivos:', error.message);
         res.status(500).json({ error: 'Error al obtener los archivos' });
     }
-
-}
+};
