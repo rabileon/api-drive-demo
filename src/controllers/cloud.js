@@ -19,6 +19,7 @@ const oauth2Client = new google.auth.OAuth2(
 // Construye la ruta del archivo creds.json
 const credPath = path.resolve(new URL(import.meta.url).pathname, '../../../creds.json');
 const tempPath = path.resolve(new URL(import.meta.url).pathname, '../../tempFiles');
+const drive = google.drive({ version: 'v3', auth: oauth2Client });
 
 try {
     const creds = fs.readFileSync(credPath);  // Asegúrate de leer correctamente el archivo
@@ -61,7 +62,7 @@ export const getFolderItems = async (req, res) => {
         const folderId = req.params.folderId; // Obtener el folderId de la URL
 
         // Crear una instancia de la API de Google Drive
-        const drive = google.drive({ version: 'v3', auth: oauth2Client });
+        // const drive = google.drive({ version: 'v3', auth: oauth2Client });
 
         // Realizar la consulta para obtener los archivos de la carpeta especificada
         const response = await drive.files.list({
@@ -92,7 +93,7 @@ export const getSearchItems = async (req, res) => {
     try {
         const { query = '', folderId } = req.query;
 
-        const drive = google.drive({ version: 'v3', auth: oauth2Client });
+        // const drive = google.drive({ version: 'v3', auth: oauth2Client });
 
         // 1. Obtener todas las carpetas (para construir rutas)
         const getAllFolders = async () => {
@@ -176,7 +177,7 @@ export const getPreview = async (req, res) => {
     const fileId = req.params.id;
 
     try {
-        const drive = google.drive({ version: 'v3', auth: oauth2Client });
+        // const drive = google.drive({ version: 'v3', auth: oauth2Client });
 
         // Obtener metadata del archivo
         const { data: file } = await drive.files.get({
@@ -294,7 +295,7 @@ export const getFolderAllItems = async (req, res) => {
         const limit = parseInt(req.query.limit) || 20;
         const startIndex = (page - 1) * limit;
 
-        const drive = google.drive({ version: 'v3', auth: oauth2Client });
+        // const drive = google.drive({ version: 'v3', auth: oauth2Client });
 
         // Recorrer subcarpetas recursivamente
         const getAllSubfolderIds = async (parentId) => {
@@ -374,7 +375,7 @@ const getFilesFromFolder = async (folderId) => {
     try {
         let allFiles = [];
         let pageToken = null;
-        const drive = google.drive({ version: 'v3', auth: oauth2Client });
+        // const drive = google.drive({ version: 'v3', auth: oauth2Client });
 
         do {
             const response = await drive.files.list({
@@ -399,7 +400,7 @@ const getFilesFromFolder = async (folderId) => {
 
 // Obtener subcarpetas
 const getAllSubfolders = async (parentId) => {
-    const drive = google.drive({ version: 'v3', auth: oauth2Client });
+    // const drive = google.drive({ version: 'v3', auth: oauth2Client });
     let subfolders = [];
     let pageToken = null;
 
@@ -476,18 +477,36 @@ export const getCountFilesFolder = async (req, res) => {
         if (!folderId) {
             return res.status(400).json({ error: 'Se requiere el folderId' });
         }
-        // Crear una instancia de la API de Google Drive
-        const drive = google.drive({ version: 'v3', auth: oauth2Client });
-        const response = await drive.files.list({
-            q: `'${folderId}' in parents and trashed = false`,
-            fields: 'files(id)',
-            pageSize: 1000,
-        });
 
-        const count = response.data.files.length;
-        res.json({ count });
+        const totalFiles = await countFilesRecursively(folderId);
+        res.json({ count: totalFiles });
+
     } catch (error) {
         console.error('Error al contar archivos:', error);
         res.status(500).json({ error: 'Error al contar archivos en Google Drive' });
     }
 };
+
+
+async function countFilesRecursively(folderId) {
+    let total = 0;
+
+    const list = await drive.files.list({
+        q: `'${folderId}' in parents and trashed = false`,
+        fields: 'files(id, mimeType)',
+        pageSize: 1000,
+    });
+
+    const files = list.data.files;
+
+    for (const file of files) {
+        if (file.mimeType === 'application/vnd.google-apps.folder') {
+            // Es una subcarpeta, contar recursivamente
+            total += await countFilesRecursively(file.id);
+        } else {
+            total += 1; // Es un archivo
+        }
+    }
+
+    return total;
+}
