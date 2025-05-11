@@ -8,7 +8,7 @@ export const getFiles = async (req, res) => {
         const offset = (page - 1) * limit;
 
 
-        const { count, rows } = await filesModel.findAndCountAll({
+        const { count, rows } = await Files.findAndCountAll({
             limit,
             offset,
             order: [['createdAt', 'DESC']], // Ordenar por fecha descendente
