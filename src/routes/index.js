@@ -17,7 +17,7 @@ fs.readdirSync(PATH_ROUTES).filter((file) => {
     const name = removeExtension(file);
 
     if (name !== 'index') {
-        console.log(`Adding route /${name}`);
+
         import(`./${file}`).then((module) => {
             router.use(`/${name}`, module.default);
         }).catch((err) => {
