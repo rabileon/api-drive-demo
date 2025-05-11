@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { setCache, getCache } from '../config/redis'; // Importamos las funciones
+import { setCache, getCache } from '../config/redis.js'; // Importamos las funciones
 
 export const getAuth = async (req, res) => {
     try {

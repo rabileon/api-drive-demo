@@ -1,5 +1,5 @@
 import express from 'express';
-import { getAuth, getFolderAllItems, getFolderItems, getPreview, getRedirect, getSearchItems, saveFilesfromFolder, getCountFilesFolder } from '../controllers/cloud.js';
+import { getAuth } from '../controllers/cloud.js';
 const router = express.Router();
 
 
