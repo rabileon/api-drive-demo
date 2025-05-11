@@ -6,9 +6,8 @@ dotenv.config();
 const redis = new Redis({
     host: process.env.REDIS_HOST,
     port: Number(process.env.REDIS_PORT),
-    username: process.env.REDIS_USERNAME, // opcional
     password: process.env.REDIS_PASSWORD,
-    tls: {} // necesario si Railway te da URL con rediss://
+    tls: process.env.REDIS_URL
 });
 
 // Función para establecer un valor en el caché

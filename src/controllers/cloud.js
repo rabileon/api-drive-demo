@@ -4,11 +4,12 @@ import { setCache, getCache } from '../config/redis.js'; // Importamos las funci
 export const getAuth = async (req, res) => {
     try {
         // Hacer la solicitud a la API de OpenDrive para obtener el SessionID
-        const response = await axios.post('https://dev.opendrive.com/api/v1/login.json', {
+        const response = await axios.post('https://dev.opendrive.com/api/v1/session/login.json', {
             username: process.env.OPENDRIVE_USER,
             passwd: process.env.OPENDRIVE_PASS
         });
 
+        console.log('Respuesta de OpenDrive:', response.data);
         // Obtener el SessionID de la respuesta
         const sessionID = response.data.SessionID;
 
