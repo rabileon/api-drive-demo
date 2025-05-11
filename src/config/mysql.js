@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 dotenv.config();  // Cargar las variables desde el archivo .env
 
 const env = process.env.ENV;
-console.log(env);
+
 const config = {
     DEV: {
         database: process.env.MYSQL_DATABASE_DEV,
