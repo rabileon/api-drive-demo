@@ -1,4 +1,6 @@
 import Redis from 'ioredis';
+import dotenv from 'dotenv';
+dotenv.config();
 
 // Crear una instancia de Redis con la configuración de entorno
 const redis = new Redis({
