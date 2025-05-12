@@ -80,7 +80,7 @@ export const getPreview = async (req, res) => {
         if (isAudio) {
             const ffmpegStream = ffmpeg(response.data)
                 .setStartTime(0)
-                .duration(50)
+                .duration(80)
                 .outputOptions([
                     '-b:a 64k',
                     '-preset ultrafast',
@@ -111,7 +111,7 @@ export const getPreview = async (req, res) => {
             writer.on('finish', () => {
                 const ffmpegStream = ffmpeg(tempFile)
                     .setStartTime(0)
-                    .duration(50)
+                    .duration(80)
                     .outputOptions([
                         '-c:v libx264',
                         '-c:a aac',
