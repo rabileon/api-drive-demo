@@ -7,15 +7,18 @@ export const getFiles = async (req, res) => {
         const limit = parseInt(req.query.limit) || 20;
         const offset = (page - 1) * limit;
 
-        const fileType = req.query.type; // 'Video' o 'Audio'
-        const whereClause = fileType ? { type: fileType } : {}; // Filtro condicional
+        const extensionFiles = req.query.extension; // 'Video' o 'Audio'
+        const whereClause = extensionFiles ? { extension: extensionFiles } : {}; // Filtro condicional
 
         const { count, rows } = await Files.findAndCountAll({
             where: whereClause,
             limit,
             offset,
             order: [['createdAt', 'DESC']],
+            attributes: { exclude: ['downloadLink', 'folderId'] } // 👈 Aquí excluyes el campo
         });
+
+
 
         res.json({
             page,
