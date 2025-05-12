@@ -14,7 +14,7 @@ export const getFiles = async (req, res) => {
             where: whereClause,
             limit,
             offset,
-            order: [['createdAt', 'DESC']],
+            order: [['dateModifiedFile', 'DESC']],
             attributes: { exclude: ['downloadLink', 'folderId'] } // 👈 Aquí excluyes el campo
         });
 

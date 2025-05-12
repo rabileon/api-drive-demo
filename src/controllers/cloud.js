@@ -153,9 +153,9 @@ export const getPreview = async (req, res) => {
 };
 
 export const syncData = async (req, res) => {
-    console.log('Iniciando sincronización de datos...');
+
     const { folderId } = req.params;
-    console.log(folderId);
+
     try {
         await syncFolderRecursive(folderId);
         res.status(200).json({ message: 'Carpeta sincronizada correctamente.' });
@@ -170,8 +170,10 @@ export const syncFolderRecursive = async (folderId, rootFolder = "") => {
     try {
         const res = await axios.get(`https://dev.opendrive.com/api/v1/folder/shared.json/${folderId}?order_type=asc`);
 
-        console.log('Respuesta de OpenDrive:', res);
-
+        if (res.data.files.length === 0) {
+            console.log(`No hay archivos en la carpeta ${folderId}`);
+            return;
+        }
         const filesApi = res.data.Files || [];
         const folders = res.data.Folders || [];
         const folderRootData = res.data.FolderInfo;
