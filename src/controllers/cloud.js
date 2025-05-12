@@ -111,7 +111,7 @@ export const getPreview = async (req, res) => {
             writer.on('finish', () => {
                 const ffmpegStream = ffmpeg(tempFile)
                     .setStartTime(0)
-                    .duration(30)
+                    .duration(50)
                     .outputOptions([
                         '-c:v libx264',
                         '-c:a aac',
