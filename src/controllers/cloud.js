@@ -79,9 +79,11 @@ export const getPreview = async (req, res) => {
 
         if (isAudio) {
             const ffmpegStream = ffmpeg(response.data)
+                .outputOptions('-map 0:a') // <--- Excluir la imagen incrustada
                 .setStartTime(0)
                 .audioBitrate('64k') // Más semántico
-                .format('mp3');
+                .format('adts') // Esto produce AAC en contenedor ADTS
+                .audioCodec('aac')
 
             res.on('close', () => {
                 try {
@@ -107,13 +109,10 @@ export const getPreview = async (req, res) => {
                     .setStartTime(0)
                     .duration(80)
                     .outputOptions([
-                        '-c:v libx264',
-                        '-c:a aac',
-                        '-crf 28',
-                        '-preset fast',
+                        '-c copy',
                         '-movflags frag_keyframe+empty_moov'
                     ])
-                    .format(outputFormat);
+                    .format('mp4');
 
                 res.on('close', () => {
                     try {
