@@ -171,6 +171,7 @@ export const syncData = async (req, res) => {
 export const syncFolderRecursive = async (folderId, rootFolder = "") => {
     try {
         const res = await axios.get(`https://dev.opendrive.com/api/v1/folder/shared.json/${folderId}?order_type=asc`);
+        const genreOther = '';
 
         if ((!res.data.Folders || res.data.Folders.length === 0) && (!res.data.Files || res.data.Files.length === 0)) {
             console.log(`No hay archivos en la carpeta ${folderId}`);
@@ -181,9 +182,14 @@ export const syncFolderRecursive = async (folderId, rootFolder = "") => {
         const folders = res.data.Folders || [];
         const folderRootData = res.data.FolderInfo;
 
+        if (folders.length == 0) {
+            genreOther = 'OTHER';
+        }
+
         // Guardar archivos del folder actual
         for (const file of filesApi) {
             const cleanedName = file.Name.replace(" Download from www.thebestmixcleanvideo.net", "");
+
             await Files.findOrCreate({
                 where: { fileId: file.FileId },
                 defaults: {

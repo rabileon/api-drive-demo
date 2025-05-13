@@ -1,4 +1,4 @@
-import { Sequelize } from 'sequelize';
+import { Op, Sequelize } from 'sequelize';
 import { Files, Genres } from '../config/mysql.js';
 
 
@@ -83,5 +83,32 @@ export const getGenres = async (req, res) => {
     } catch (error) {
         console.error('Error al obtener géneros:', error.message);
         res.status(500).json({ error: 'Error al obtener los géneros' });
+    }
+};
+
+export const searchFiles = async (req, res) => {
+    try {
+        const { query = '' } = req.query;
+
+        if (!query.trim()) {
+            return res.status(400).json({ error: 'Se requiere una consulta de búsqueda.' });
+        }
+
+        const results = await Files.findAll({
+            where: {
+                [Op.or]: [
+                    { name: { [Op.like]: `%${query}%` } },
+                    { genre: { [Op.like]: query } }
+                ]
+            },
+            order: [['createdAt', 'DESC']],
+            limit: 100,
+        });
+
+
+        res.json(results);
+    } catch (error) {
+        console.error('Error en búsqueda:', error);
+        res.status(500).json({ error: 'Error interno del servidor' });
     }
 };

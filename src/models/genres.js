@@ -16,10 +16,56 @@ export const genresModel = (db, type) => {
     });
 };
 
-export const initializeGenres = async (GenresModel) => {
+export const genresInit = [
+    { name: 'AFRO LATIN' },
+    { name: 'AFROBEAT' },
+    { name: 'AFROHOUSE' },
+    { name: 'ALL' },
+    { name: 'BRAZILIAN FUNK' },
+    { name: 'COUNTRY' },
+    { name: 'CUMBIA' },
+    { name: 'DANCE' },
+    { name: 'DEMBOW' },
+    { name: 'DISCO' },
+    { name: 'EDM' },
+    { name: 'FUNKY HOUSE' },
+    { name: 'HAPPY HARDCORE' },
+    { name: 'HARD TRANCE' },
+    { name: 'HIP HOP' },
+    { name: 'HOUSE' },
+    { name: 'LATIN DANCE' },
+    { name: 'LATIN HOUSE' },
+    { name: 'MAMBO LATINO' },
+    { name: 'MASHUP' },
+    { name: 'MELODIC TECHNO' },
+    { name: 'NU DISCO' },
+    { name: 'PIANO HOUSE' },
+    { name: 'POP' },
+    { name: 'POP DANCE' },
+    { name: 'POP LATINO' },
+    { name: 'REGGAE' },
+    { name: 'REGGAETON' },
+    { name: 'RNB' },
+    { name: 'ROCK' },
+    { name: 'ROCK-POP' },
+    { name: 'SALSA' },
+    { name: 'TECH HOUSE' },
+    { name: 'TRANSITION' },
+    { name: 'TRAP' },
+    { name: 'TRAP LATINO' },
+    { name: 'NORTEÑO' },
+    { name: 'RETRO 80s' },
+    { name: 'RETRO 90s' },
+    { name: 'RETRO 70s' },
+    { name: 'ELECTRO' },
+    { name: 'OTHER' },
+
+];
+
+export const initializeGenres = async (GenresModel, genres) => {
     const count = await GenresModel.count();
     if (count === 0) {
-        await GenresModel.create({ name: 'All' });
-        console.log('Género "All" creado como el primero');
+        await GenresModel.bulkCreate(genres, { ignoreDuplicates: true }); // Evita duplicados si ya existen
+        console.log('Géneros creados correctamente');
     }
 };
