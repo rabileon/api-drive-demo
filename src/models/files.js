@@ -17,6 +17,10 @@ export const filesModel = (db, type) => {
         extension: {
             type: type.STRING,
         },
+        categoria: {
+            type: type.INTEGER,
+        },
+
         folderId: {
             type: type.STRING,
         },

@@ -170,10 +170,11 @@ export const syncFolderRecursive = async (folderId, rootFolder = "") => {
     try {
         const res = await axios.get(`https://dev.opendrive.com/api/v1/folder/shared.json/${folderId}?order_type=asc`);
 
-        if (res.data.files.length === 0) {
+        if ((!res.data.Folders || res.data.Folders.length === 0) && (!res.data.Files || res.data.Files.length === 0)) {
             console.log(`No hay archivos en la carpeta ${folderId}`);
             return;
         }
+
         const filesApi = res.data.Files || [];
         const folders = res.data.Folders || [];
         const folderRootData = res.data.FolderInfo;
