@@ -109,6 +109,8 @@ export const getPreview = async (req, res) => {
                     .setStartTime(0)
                     .duration(80)
                     .outputOptions([
+                        '-map 0:v', // incluir solo video
+                        '-map 0:a', // incluir solo audio
                         '-c copy',
                         '-movflags frag_keyframe+empty_moov'
                     ])
