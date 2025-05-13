@@ -80,13 +80,8 @@ export const getPreview = async (req, res) => {
         if (isAudio) {
             const ffmpegStream = ffmpeg(response.data)
                 .setStartTime(0)
-                .duration(80)
-                .outputOptions([
-                    '-b:a 64k',
-                    '-preset ultrafast',
-                    '-movflags +faststart+frag_keyframe+empty_moov',
-                ])
-                .format(outputFormat);
+                .audioBitrate('64k') // Más semántico
+                .format('mp3');
 
             res.on('close', () => {
                 try {
@@ -101,7 +96,6 @@ export const getPreview = async (req, res) => {
                     if (!res.headersSent) res.status(500).send('Error al procesar preview');
                 })
                 .pipe(res, { end: true });
-
         } else {
             const tempFile = path.join(tempPath, `video_${Date.now()}.mp4`);
             const writer = fs.createWriteStream(tempFile);
