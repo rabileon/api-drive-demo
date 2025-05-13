@@ -1,3 +1,4 @@
+import { Sequelize } from 'sequelize';
 import { Files, Genres } from '../config/mysql.js';
 
 
@@ -72,7 +73,10 @@ export const getGenres = async (req, res) => {
     try {
         const generos = await Genres.findAll({
             attributes: ['id', 'name'], // Solo devolvemos lo necesario
-            order: [['name', 'ASC']],
+            order: [
+                [Sequelize.literal(`CASE WHEN name = 'ALL' THEN 0 ELSE 1 END`), 'ASC'],
+                ['name', 'ASC'] // opcional: orden alfabético para el resto
+            ],
         });
 
         res.json({ generos });

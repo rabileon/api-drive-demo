@@ -15,3 +15,11 @@ export const genresModel = (db, type) => {
         timestamps: true,
     });
 };
+
+export const initializeGenres = async (GenresModel) => {
+    const count = await GenresModel.count();
+    if (count === 0) {
+        await GenresModel.create({ name: 'All' });
+        console.log('Género "All" creado como el primero');
+    }
+};

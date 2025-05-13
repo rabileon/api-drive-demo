@@ -1,7 +1,7 @@
 import sequelize from 'sequelize';
 import { filesModel } from '../models/files.js';
 import dotenv from 'dotenv';
-import { genresModel } from '../models/genres.js';
+import { genresModel, initializeGenres } from '../models/genres.js';
 dotenv.config();  // Cargar las variables desde el archivo .env
 
 const env = process.env.ENV;
@@ -37,7 +37,7 @@ export const db = new sequelize(database, username, password, {
 export const Files = filesModel(db, sequelize);
 
 export const Genres = genresModel(db, sequelize);
-
+await initializeGenres(Genres);
 
 export const dbConnectMysql = async () => {
     try {
