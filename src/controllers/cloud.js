@@ -61,7 +61,12 @@ export const getPreview = async (req, res) => {
 
         const mime = file.MimeType || file.Extension;
         const isVideo = mime && mime.includes('mp4');
-        const isAudio = mime && mime.startsWith('audio/');
+        const isAudio = mime && (
+            mime.includes('mp3') ||
+            mime.includes('audio/wav') ||
+            mime.includes('audio/x-wav') ||
+            mime.includes('audio/wave') ||
+            mime.includes('audio')
 
         if (!isVideo && !isAudio) {
             return res.status(400).send('Archivo no compatible para preview');
@@ -109,10 +114,9 @@ export const getPreview = async (req, res) => {
                     .setStartTime(0)
                     .duration(80)
                     .outputOptions([
-                        '-c:v libx264',
-                        '-c:a aac',
-                        '-crf 28',
-                        '-preset fast',
+                        '-map 0:v:0', // Mapeo de video
+                        '-map 0:a:0', // Mapeo de audio
+                        '-c:v copy', // Copiar video sin re-encodear
                         '-movflags frag_keyframe+empty_moov'
                     ])
                     .format('mp4');
