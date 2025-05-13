@@ -63,10 +63,12 @@ export const getPreview = async (req, res) => {
         const isVideo = mime && mime.includes('mp4');
         const isAudio = mime && (
             mime.includes('mp3') ||
+            mime.includes('mpeg') ||
             mime.includes('audio/wav') ||
             mime.includes('audio/x-wav') ||
             mime.includes('audio/wave') ||
             mime.includes('audio')
+        );
 
         if (!isVideo && !isAudio) {
             return res.status(400).send('Archivo no compatible para preview');
