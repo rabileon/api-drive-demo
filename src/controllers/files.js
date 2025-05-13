@@ -8,7 +8,7 @@ export const getFiles = async (req, res) => {
         const limit = parseInt(req.query.limit) || 20;
         const offset = (page - 1) * limit;
 
-        const genre = req.query.genre; // solo se usa si está definido
+        const genre = req.query.genre === 'ALL' ? '' : req.query.genre;; // solo se usa si está definido
 
         const whereClause = {}; // Inicializa objeto vacío
 
