@@ -7,20 +7,23 @@ export const getFiles = async (req, res) => {
         const limit = parseInt(req.query.limit) || 20;
         const offset = (page - 1) * limit;
 
-        const genre = req.query.genre; // 'Video' o 'Audio'
+        const genre = req.query.genre; // solo se usa si está definido
 
-        // const whereClause = extensionFiles ? { extension: extensionFiles } : {}; // Filtro condicional
+        const whereClause = {}; // Inicializa objeto vacío
+
+        if (genre) {
+            whereClause.genre = genre; // Agrega filtro solo si viene
+        }
 
         const { count, rows } = await Files.findAndCountAll({
-
-            where: { genre },
+            where: whereClause,
             limit,
             offset,
             order: [['dateModifiedFile', 'DESC']],
-            attributes: { exclude: ['downloadLink', 'folderId'] } // 👈 Aquí excluyes el campo
+            attributes: {
+                exclude: ['downloadLink', 'folderId'],
+            },
         });
-
-
 
         res.json({
             page,
