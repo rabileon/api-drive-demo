@@ -7,10 +7,13 @@ export const getFiles = async (req, res) => {
         const limit = parseInt(req.query.limit) || 20;
         const offset = (page - 1) * limit;
 
-        // const extensionFiles = req.query.extension; // 'Video' o 'Audio'
+        const genre = req.query.genre; // 'Video' o 'Audio'
+
         // const whereClause = extensionFiles ? { extension: extensionFiles } : {}; // Filtro condicional
 
         const { count, rows } = await Files.findAndCountAll({
+
+            where: { genre },
             limit,
             offset,
             order: [['dateModifiedFile', 'DESC']],
