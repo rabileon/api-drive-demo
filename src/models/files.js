@@ -10,6 +10,7 @@ export const filesModel = (db, type) => {
         fileId: {
             type: type.STRING,
             allowNull: false,
+            unique: true,
         },
         name: {
             type: type.STRING,
@@ -20,11 +21,13 @@ export const filesModel = (db, type) => {
         categoria: {
             type: type.INTEGER,
         },
-
         folderId: {
             type: type.STRING,
         },
         folderName: {
+            type: type.STRING,
+        },
+        genre: {
             type: type.STRING,
         },
         folderRoot: {

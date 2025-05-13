@@ -191,6 +191,7 @@ export const syncFolderRecursive = async (folderId, rootFolder = "") => {
                     extension: file.Extension,
                     folderId: folderRootData.FolderID,
                     folderName: folderRootData.Name.toUpperCase(),
+                    genre: folderRootData.Name.toUpperCase(),
                     folderRoot: rootFolder?.trim() || folderRootData.Name,
                     downloadLink: file.DownloadLink,
                     dateModifiedFile: new Date(file.DateModified * 1000),
