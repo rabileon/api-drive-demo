@@ -63,6 +63,7 @@ export const getPreview = async (req, res) => {
         const isVideo = mime && mime.includes('mp4');
         const isAudio = mime && (
             mime.includes('mp3') ||
+            mime.includes('wav') ||
             mime.includes('mpeg') ||
             mime.includes('audio/wav') ||
             mime.includes('audio/x-wav') ||
@@ -116,8 +117,7 @@ export const getPreview = async (req, res) => {
                     .setStartTime(0)
                     .duration(80)
                     .outputOptions([
-                        '-map 0:v:0', // Mapeo de video
-                        '-map 0:a:0', // Mapeo de audio
+
                         '-c:v copy', // Copiar video sin re-encodear
                         '-movflags frag_keyframe+empty_moov'
                     ])
