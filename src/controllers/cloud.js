@@ -171,7 +171,7 @@ export const syncData = async (req, res) => {
 export const syncFolderRecursive = async (folderId, rootFolder = "") => {
     try {
         const res = await axios.get(`https://dev.opendrive.com/api/v1/folder/shared.json/${folderId}?order_type=asc`);
-        const genreOther = '';
+        let genre = '';
 
         if ((!res.data.Folders || res.data.Folders.length === 0) && (!res.data.Files || res.data.Files.length === 0)) {
             console.log(`No hay archivos en la carpeta ${folderId}`);
@@ -179,14 +179,20 @@ export const syncFolderRecursive = async (folderId, rootFolder = "") => {
         }
 
         const filesApi = res.data.Files || [];
+
         const folders = res.data.Folders || [];
+
         const folderRootData = res.data.FolderInfo;
 
-        if (folders.length == 0) {
-            genreOther = 'OTHER';
+        const childFolders = res.data.ChildFolders || 0;
+        console.log(filesApi.length);
+
+
+        if (childFolders > 0 && filesApi.length > 0) {
+            genre = 'OTHER';
         }
         else {
-            folderRootData.Name.toUpperCase();
+            genre = folderRootData.Name.toUpperCase();
         }
 
         // Guardar archivos del folder actual
@@ -200,7 +206,7 @@ export const syncFolderRecursive = async (folderId, rootFolder = "") => {
                     extension: file.Extension,
                     folderId: folderRootData.FolderID,
                     folderName: folderRootData.Name.toUpperCase(),
-                    genre: genreOther,
+                    genre: genre,
                     folderRoot: rootFolder?.trim() || folderRootData.Name,
                     downloadLink: file.DownloadLink,
                     dateModifiedFile: new Date(file.DateModified * 1000),
