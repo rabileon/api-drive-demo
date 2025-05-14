@@ -13,7 +13,7 @@ export const filesModel = (db, type) => {
             unique: true,
         },
         name: {
-            type: type.STRING,
+            type: type.TEXT,
         },
         extension: {
             type: type.STRING,

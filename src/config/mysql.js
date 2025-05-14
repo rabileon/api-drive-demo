@@ -2,6 +2,7 @@ import sequelize from 'sequelize';
 import { filesModel } from '../models/files.js';
 import dotenv from 'dotenv';
 import { genresModel, initializeGenres, genresInit } from '../models/genres.js';
+import { logging } from 'googleapis/build/src/apis/logging/index.js';
 dotenv.config();  // Cargar las variables desde el archivo .env
 
 const env = process.env.ENV;

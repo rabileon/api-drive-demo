@@ -154,44 +154,38 @@ export const getPreview = async (req, res) => {
     }
 };
 
-export const syncData = async (req, res) => {
+// export const syncData = async (req, res) => {
 
-    const { folderId } = req.params;
+//     const { folderId } = req.params;
 
-    try {
-        await syncFolderRecursive(folderId);
-        res.status(200).json({ message: 'Carpeta sincronizada correctamente.' });
-    } catch (error) {
-        console.error('Error al sincronizar carpeta:', error.message);
-        res.status(500).json({ error: 'Ocurrió un error al sincronizar la carpeta.' });
-    }
-};
+//     try {
+//         await syncFolderRecursive(folderId);
+//         res.status(200).json({ message: 'Carpeta sincronizada correctamente.' });
+//     } catch (error) {
+//         console.error('Error al sincronizar carpeta:', error.message);
+//         res.status(500).json({ error: 'Ocurrió un error al sincronizar la carpeta.' });
+//     }
+// };
 
 
-export const syncFolderRecursive = async (folderId, rootFolder = "") => {
+export const syncFolderRecursive = async (folderId, rootFolder = "", erroresLog = []) => {
     try {
         const res = await axios.get(`https://dev.opendrive.com/api/v1/folder/shared.json/${folderId}?order_type=asc`);
         let genre = '';
 
         if ((!res.data.Folders || res.data.Folders.length === 0) && (!res.data.Files || res.data.Files.length === 0)) {
             console.log(`No hay archivos en la carpeta ${folderId}`);
-            return;
+            return erroresLog;
         }
 
         const filesApi = res.data.Files || [];
-
         const folders = res.data.Folders || [];
-
         const folderRootData = res.data.FolderInfo;
-
         const childFolders = res.data.ChildFolders || 0;
-        console.log(filesApi.length);
-
 
         if (childFolders > 0 && filesApi.length > 0) {
             genre = 'OTHER';
-        }
-        else {
+        } else {
             genre = folderRootData.Name.toUpperCase();
         }
 
@@ -199,28 +193,91 @@ export const syncFolderRecursive = async (folderId, rootFolder = "") => {
         for (const file of filesApi) {
             const cleanedName = file.Name.replace(" Download from www.thebestmixcleanvideo.net", "");
 
-            await Files.findOrCreate({
-                where: { fileId: file.FileId },
-                defaults: {
+            try {
+                await Files.findOrCreate({
+                    where: { fileId: file.FileId },
+                    defaults: {
+                        name: cleanedName,
+                        extension: file.Extension,
+                        folderId: folderRootData.FolderID,
+                        folderName: folderRootData.Name.toUpperCase(),
+                        genre: genre,
+                        folderRoot: rootFolder?.trim() || folderRootData.Name,
+                        downloadLink: file.DownloadLink,
+                        dateModifiedFile: new Date(file.DateModified * 1000),
+                    },
+                });
+            } catch (fileError) {
+                console.error(`❌ Error creando archivo ${file.Name}:`, fileError.message);
+                erroresLog.push({
+                    folderId: folderId,
+                    fileId: file.FileId,
                     name: cleanedName,
-                    extension: file.Extension,
-                    folderId: folderRootData.FolderID,
-                    folderName: folderRootData.Name.toUpperCase(),
-                    genre: genre,
-                    folderRoot: rootFolder?.trim() || folderRootData.Name,
-                    downloadLink: file.DownloadLink,
-                    dateModifiedFile: new Date(file.DateModified * 1000),
-                },
-            });
+                    error: fileError.message,
+                });
+            }
         }
 
         // Recursividad: recorrer subcarpetas
         for (const subfolder of folders) {
-
-            await syncFolderRecursive(subfolder.FolderID, folderRootData.Name); // llamada recursiva
+            await syncFolderRecursive(subfolder.FolderID, folderRootData.Name, erroresLog);
         }
+
+        return erroresLog;
+
     } catch (err) {
-        console.error(`Error al procesar carpeta ${folderId}:`, err.message);
-        throw err;
+        console.error(`❌ Error al procesar carpeta ${folderId}:`, err.message);
+        erroresLog.push({
+            folderId,
+            error: err.message,
+            context: 'Error general al procesar la carpeta',
+        });
+        return erroresLog;
     }
+};
+
+export const syncData = async (req, res) => {
+    const { folderId } = req.params;
+    const { webhookUrl } = req.body; // el cliente lo manda en el body
+
+    if (!webhookUrl) {
+        return res.status(400).json({ error: 'Se requiere el webhookUrl en el body.' });
+    }
+
+    // 1. Responder inmediatamente
+    res.status(202).json({ message: 'Sincronización iniciada.' });
+
+    // 2. Ejecutar en background
+    setImmediate(async () => {
+        try {
+            const errores = await syncFolderRecursive(folderId);
+            if (errores.length > 0) {
+                console.log('📋 Errores durante la sincronización:');
+                console.table(errores); // muestra errores de forma ordenada
+            }
+
+            // 3. Enviar notificación vía webhook
+            await axios.post(webhookUrl, {
+                status: 'success',
+                folderId,
+                message: 'Carpeta sincronizada correctamente.'
+            });
+
+            console.log('✅ Webhook enviado a', webhookUrl);
+        } catch (error) {
+            console.error('❌ Error al sincronizar o enviar webhook:', error.message);
+
+            // 4. Enviar error vía webhook
+            try {
+                await axios.post(webhookUrl, {
+                    status: 'error',
+                    folderId,
+                    message: 'Error al sincronizar carpeta.',
+                    error: error.message
+                });
+            } catch (whErr) {
+                console.error('❌ Error al enviar el webhook de error:', whErr.message);
+            }
+        }
+    });
 };
