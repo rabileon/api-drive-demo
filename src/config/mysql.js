@@ -37,7 +37,7 @@ export const db = new sequelize(database, username, password, {
 export const Files = filesModel(db, sequelize);
 
 export const Genres = genresModel(db, sequelize);
-await initializeGenres(Genres, genresInit);
+// await initializeGenres(Genres, genresInit);
 
 export const dbConnectMysql = async () => {
     try {
