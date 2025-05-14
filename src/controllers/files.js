@@ -59,10 +59,13 @@ export const extractGenres = async (req, res) => {
         const genresArray = Array.from(genresSet);
 
         for (const name of genresArray) {
-            await Genres.findOrCreate({ where: { name } }); // Inserta solo si no existe
+            await Genres.findOrCreate({ where: { name } });
         }
 
-        res.status(201).json({ message: 'Géneros extraídos y registrados', total: generosArray.length });
+        res.status(201).json({
+            message: 'Géneros extraídos y registrados',
+            total: genresArray.length // ✅ corrección aquí
+        });
     } catch (error) {
         console.error('Error al extraer y registrar géneros:', error);
         res.status(500).json({ error: 'Error al registrar géneros en la base de datos' });
