@@ -185,6 +185,9 @@ export const syncFolderRecursive = async (folderId, rootFolder = "") => {
         if (folders.length == 0) {
             genreOther = 'OTHER';
         }
+        else {
+            folderRootData.Name.toUpperCase()
+        }
 
         // Guardar archivos del folder actual
         for (const file of filesApi) {
@@ -197,7 +200,7 @@ export const syncFolderRecursive = async (folderId, rootFolder = "") => {
                     extension: file.Extension,
                     folderId: folderRootData.FolderID,
                     folderName: folderRootData.Name.toUpperCase(),
-                    genre: folderRootData.Name.toUpperCase(),
+                    genre: genreOther,
                     folderRoot: rootFolder?.trim() || folderRootData.Name,
                     downloadLink: file.DownloadLink,
                     dateModifiedFile: new Date(file.DateModified * 1000),
