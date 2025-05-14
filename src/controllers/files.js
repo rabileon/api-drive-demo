@@ -88,25 +88,45 @@ export const getGenres = async (req, res) => {
 
 export const searchFiles = async (req, res) => {
     try {
-        const { query = '' } = req.query;
+        const { query = '', page, limit } = req.query;
 
+        // Validar que query no esté vacío
         if (!query.trim()) {
             return res.status(400).json({ error: 'Se requiere una consulta de búsqueda.' });
         }
 
-        const results = await Files.findAll({
+        // Asumir que vienen definidos pero validar su conversión
+        const pageInt = parseInt(page);
+        const limitInt = parseInt(limit);
+
+        if (isNaN(pageInt) || pageInt < 1 || isNaN(limitInt) || limitInt < 1) {
+            return res.status(400).json({ error: 'Parámetros de paginación inválidos.' });
+        }
+
+        const offset = (pageInt - 1) * limitInt;
+
+        const { count, rows } = await Files.findAndCountAll({
             where: {
                 [Op.or]: [
                     { name: { [Op.like]: `%${query}%` } },
-                    { genre: { [Op.like]: query } }
+                    { genre: { [Op.like]: `%${query}%` } }
                 ]
             },
-            order: [['createdAt', 'DESC']],
-            limit: 100,
+            order: [['dateModifiedFile', 'DESC']],
+            limit: limitInt,
+            offset,
+            attributes: {
+                exclude: ['downloadLink', 'folderId'],
+            },
         });
 
-
-        res.json(results);
+        res.json({
+            page: pageInt,
+            limit: limitInt,
+            totalItems: count,
+            totalPages: Math.ceil(count / limitInt),
+            files: rows,
+        });
     } catch (error) {
         console.error('Error en búsqueda:', error);
         res.status(500).json({ error: 'Error interno del servidor' });
