@@ -186,7 +186,7 @@ export const syncFolderRecursive = async (folderId, rootFolder = "") => {
             genreOther = 'OTHER';
         }
         else {
-            folderRootData.Name.toUpperCase()
+            folderRootData.Name.toUpperCase();
         }
 
         // Guardar archivos del folder actual
